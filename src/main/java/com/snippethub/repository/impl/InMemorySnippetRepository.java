@@ -5,31 +5,25 @@
  */
 package com.snippethub.repository.impl;
 
-
 import com.snippethub.repository.SnippetRepository;
 import com.snippethub.model.Snippet;
 import com.snippethub.model.Tag;
 import com.snippethub.model.util.Util;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.stereotype.Repository;
 
-/**
- *
- * @author Rakesh Shrestha
- */
+
 @Repository
 public class InMemorySnippetRepository implements SnippetRepository {
 
     public InMemorySnippetRepository() throws IOException {
-       List<Tag> listOfTags1 = new ArrayList<>();
+        List<Tag> listOfTags1 = new ArrayList<>();
         List<Tag> listOfTags2 = new ArrayList<>();
         List<Tag> listOfTags3 = new ArrayList<>();
         List<Tag> listOfTags4 = new ArrayList<>();
@@ -37,22 +31,22 @@ public class InMemorySnippetRepository implements SnippetRepository {
         Tag tag21 = new Tag("javascript");
         listOfTags2.add(tag2);
         listOfTags2.add(tag21);
-        
+
         Tag tag1 = new Tag("php");
         Tag tag12 = new Tag("register");
         listOfTags1.add(tag1);
         listOfTags1.add(tag12);
-        
+
         Tag tag3 = new Tag("python");
         listOfTags3.add(tag3);
-        
+
         Tag tag4 = new Tag("java");
         Tag tag42 = new Tag("convertor");
-         Tag tag43 = new Tag("binary");
+        Tag tag43 = new Tag("binary");
         listOfTags4.add(tag4);
         listOfTags4.add(tag42);
         listOfTags4.add(tag43);
-        
+
         String key = readFromFile("php");
         String key2 = readFromFile("js");
         String key3 = readFromFile("python");
@@ -67,10 +61,14 @@ public class InMemorySnippetRepository implements SnippetRepository {
         listOfSnippet.add(sn4);
     }
 
-     public String readFromFile(String fileName) throws FileNotFoundException, IOException{
-         String path="C:/Users/tekeste/Documents/snippetHubFiles/"+fileName+".txt";
-         BufferedReader br = new BufferedReader(new FileReader(path));
-      
+    public String readFromFile(String fileName) throws FileNotFoundException, IOException {
+        /*String path = new ClassPathResource("languages" + File.separator + fileName + ".txt").getFilename();
+//"/resources/languages/"+fileName+".txt";*/
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("languages/"+fileName+".txt").getFile());
+        
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
         StringBuilder sb = new StringBuilder();
         String line = br.readLine();
 
@@ -80,9 +78,10 @@ public class InMemorySnippetRepository implements SnippetRepository {
             line = br.readLine();
         }
         return sb.toString();
-     }   
+    }
 
     private final List<Snippet> listOfSnippet = new ArrayList<>();
+
     @Override
     public List<Snippet> getAllSnippets() {
         return listOfSnippet;
@@ -90,17 +89,17 @@ public class InMemorySnippetRepository implements SnippetRepository {
 
     @Override
     public Snippet getSnippetById(long snippetId) {
-        for(Snippet snippet: listOfSnippet){
-            if(snippet.getSnippetId()==(snippetId)) {
+        for (Snippet snippet : listOfSnippet) {
+            if (snippet.getSnippetId() == (snippetId)) {
                 return snippet;
-            } 
+            }
         }
         throw new IllegalArgumentException(
                 String.format("Snippet with id %s not found", snippetId));
     }
-    
-     @Override
-    public void addSnippet(Snippet snippet){
+
+    @Override
+    public void addSnippet(Snippet snippet) {
 
         listOfSnippet.add(snippet);
     }
@@ -114,9 +113,10 @@ public class InMemorySnippetRepository implements SnippetRepository {
         }
         return null;
     }
-     @Override
-    public List<Snippet> getSnippetListByFirstName(String firstName){
-        List<Snippet> userSnippetList=new ArrayList<>();
+
+    @Override
+    public List<Snippet> getSnippetListByFirstName(String firstName) {
+        List<Snippet> userSnippetList = new ArrayList<>();
         for (Snippet snippet : listOfSnippet) {
             if (snippet.getOwner().equals(firstName)) {
                 userSnippetList.add(snippet);
@@ -124,6 +124,7 @@ public class InMemorySnippetRepository implements SnippetRepository {
         }
         return userSnippetList;
     }
+
     @Override
     public List<Snippet> getSnippetByTagTitle(String tagTitle) {
         List<Snippet> tagSnippetList = new ArrayList<>();
@@ -143,31 +144,34 @@ public class InMemorySnippetRepository implements SnippetRepository {
         }
         return tagSnippetList;
     }
-        @Override
-    public List<Snippet> getSharedSnippetsByFirstName( String firstName, String visibility ){       
-        List<Snippet> userSnippetList= new ArrayList<>();
-        
-            for (Snippet snippet : listOfSnippet) {
-                if (snippet.getOwner().equals(firstName) ) 
-                     if( visibility.equals("all") ) {
-                           userSnippetList.add(snippet);
-                     } else if( snippet.getVisiblity().equals("public")){
-                           userSnippetList.add(snippet);
-                     }
-            } 
-                
-         return userSnippetList;
+
+    @Override
+    public List<Snippet> getSharedSnippetsByFirstName(String firstName, String visibility) {
+        List<Snippet> userSnippetList = new ArrayList<>();
+
+        for (Snippet snippet : listOfSnippet) {
+            if (snippet.getOwner().equals(firstName)) {
+                if (visibility.equals("all")) {
+                    userSnippetList.add(snippet);
+                } else if (snippet.getVisiblity().equals("public")) {
+                    userSnippetList.add(snippet);
+                }
+            }
+        }
+
+        return userSnippetList;
     }
 
     @Override
     public void deleteSnippet(String slug) {
-        for(Snippet snippet : listOfSnippet) {
-            if(snippet.getSlug().equals(slug)) {
+        for (Snippet snippet : listOfSnippet) {
+            if (snippet.getSlug().equals(slug)) {
                 listOfSnippet.remove(snippet);
                 break;
             }
         }
     }
+
     @Override
     public void editSnippet(Snippet snippet) {
 
