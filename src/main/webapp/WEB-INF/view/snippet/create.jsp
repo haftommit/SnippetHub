@@ -1,7 +1,7 @@
 <%-- 
     Document   : page1
     Created on : May 16, 2016, 5:57:07 PM
-    Author     : tekeste
+    Author     : Haftom Alemayehu
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
